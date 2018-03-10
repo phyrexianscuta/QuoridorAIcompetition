@@ -13,21 +13,6 @@ import javax.swing.JPanel;
 
 
 public class GraphPosition extends JPanel {
-	static ArrayList<int[]> AllEdges = new ArrayList<int[]>();
-	
-	static void setEdges(){
-		AllEdges.clear();
-		for(int i=0;i<8;i++){
-			for(int j=0;j<8;j++){
-				AllEdges.add( new int[] {9*i+j,9*i+j+1} );
-				AllEdges.add( new int[] {9*i+j , 9*i+j+9} );
-			}
-		}
-		for(int i=1;i<9;i++){
-			AllEdges.add( new int[] {9*i-1,9*i+8});
-			AllEdges.add( new int[] {71+i,72+i});
-		}
-	}
 	
 	static boolean contains(ArrayList<int[]> edges, int[] edge) {
 		for(int i=0; i<edges.size(); i++) {
@@ -59,36 +44,8 @@ public class GraphPosition extends JPanel {
 			}
 		}
 	}
-	
-	static void initEdges2(ArrayList<int[]> AllEdges, ArrayList<int[]> edges,Graphics2D g2d){
-		for(int l =0; l<AllEdges.size(); l++){
-			int[] edge = AllEdges.get(l);
-			if(!contains(edges,edge)){
-				if(edge[1] == edge[0]+1) {
-					int fila = edges.get(l)[0]/9;
-					int columna = edges.get(l)[0]%9;
-					int topDisp = 37+15+fila*60;
-					int leftDisp = 95+3 +20+ columna*60;
-					
-					g2d.setColor(new Color(230,152,76));
-					g2d.fillRect(leftDisp, topDisp, 30, 7);
-					
-				}
-				else {
-					int fila = edges.get(l)[0]/9;
-					int columna = edges.get(l)[0]%9;
-					int topDisp = 55+20+5+fila*60;
-					int leftDisp = 77 +15+columna*60;
-					
-					g2d.setColor(new Color(230,152,76));
-					g2d.fillRect(leftDisp, topDisp, 7, 30);	
-				}
-
-			}
-		}	
-	}
-	
-	static void initEdges(ArrayList<int[]> edges,Graphics2D g2d){
+		
+	static void initEdges2(ArrayList<int[]> edges,Graphics2D g2d){
 		for(int l =0; l<edges.size(); l++){
 			if(edges.get(l)[1]==edges.get(l)[0]+1){
 				int fila = edges.get(l)[0]/9;
@@ -108,6 +65,31 @@ public class GraphPosition extends JPanel {
 
 			}
 		}	
+	}
+	
+	static void initEdges(int[] horizontal_tiles_placed, int[] vertical_tiles_placed,Graphics2D g2d) {
+		for (int i=0; i< 64; i++) {
+			if(vertical_tiles_placed[i]==1) {
+				int leftDisp = 115 +(i%8)*60;
+				int topDisp = 30+ (i/8)*60;
+				g2d.setColor(new Color(230,152,76));
+				g2d.fillRect(leftDisp, topDisp, 15,105);
+//				g2d.setColor(Color.RED);
+//		        g2d.setFont(new Font("Arial Black", Font.BOLD, 20));
+//				g2d.drawString(" "+i, 610,+10*i);
+			}
+		}
+		for (int i=0; i< 64; i++) {
+			if(horizontal_tiles_placed[i]==1) {
+				int leftDisp = 130-60 +(i%8)*60;
+				int topDisp = 75+ (i/8)*60;
+				g2d.setColor(new Color(230,152,76));
+				g2d.fillRect(leftDisp, topDisp, 105,15);
+//				g2d.setColor(Color.RED);
+//		        g2d.setFont(new Font("Arial Black", Font.BOLD, 20));
+//				g2d.drawString(" "+i, 10*i,580);
+			}
+		}
 	}
 	
 	static void initData(char AI_1_colour,char AI_2_colour,int AI_1_walls,int AI_2_walls, int turns, Graphics2D g2d) {
@@ -134,22 +116,19 @@ public class GraphPosition extends JPanel {
 		Graphics2D  g2d = img.createGraphics();
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, 800, 600);
-		g2d.setColor(new Color(230,152,76));
-		g2d.fillRect(70, 30, 525, 525);
+//		g2d.setColor(new Color(230,152,76));
+//		g2d.fillRect(70, 30, 525, 525);
 		return g2d;
 	}
 	
-	
-	
-	public static void main(ArrayList<Object> vertices, ArrayList<int[]> edges, String filename ,String directory, char AI_1_colour, char AI_2_colour, int AI_1_walls, int AI_2_walls, int turns) throws IOException {		
+	public static void main(ArrayList<Object> vertices, ArrayList<int[]> edges, String filename ,String directory, char AI_1_colour, char AI_2_colour, int AI_1_walls, int AI_2_walls, int turns,int[] horizontal_tiles_placed , int[] vertical_tiles_placed) throws IOException {		
 
-		setEdges();
 		BufferedImage Image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
 		
 		Graphics2D g2d = initBackground(Image);
 		initData(AI_1_colour,AI_2_colour,AI_1_walls,AI_2_walls,turns,g2d);
 		initVertices(edges,vertices,g2d);
-		initEdges(edges,g2d);
+		initEdges(horizontal_tiles_placed, vertical_tiles_placed, g2d);
 		g2d.dispose();
 		
         File f = new File(directory);

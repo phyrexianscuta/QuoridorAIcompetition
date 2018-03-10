@@ -10,11 +10,15 @@ public class QuoridorAIcompetition {
 	
 	static ArrayList<Object> vertices = new ArrayList<Object>();
 	static ArrayList<int[]> edges = new ArrayList<int[]>();
-	
+	//All possible places where to locate an horizontal/vertical wall. A 0 represents the space is available, a 1 that is unavailable, but not that necessarily there was a wall placed there.
 	static int[] horizontal_tiles = new int[64];
 	static int[] vertical_tiles = new  int[64];
+	//All possible places where to locate an horizontal /vertical wall, the difference is that an 1 indicates that a wall was located there. Thus, there are at most ten 1s in each array.
+	//They are used only for graphing the board.
+	static int[] horizontal_tiles_placed = new int[64];
+	static int[] vertical_tiles_placed = new  int[64];
 	
-	static int SIMS = 20;
+	static int SIMS = 1;
 	
 	static void setVertices() {
 		vertices.clear();
@@ -48,36 +52,100 @@ public class QuoridorAIcompetition {
 		AI_2.walls = 10;
 	}
 	
+	public static void placeHW_DEBUGTOOL(int index){
+		int indexBM = CommonMethods.topLeftVertex(index);
+
+		horizontal_tiles[index] = 1;
+		horizontal_tiles_placed[index] = 1;
+		if(index+1<64 && index/8 == (index+1)/8){
+			horizontal_tiles[index+1] = 1;
+		}
+		if(index-1>=0 && index/8 == (index-1)/8){
+			horizontal_tiles[index-1] = 1;
+		}
+		vertical_tiles[index] = 1;
+
+		edges.remove( CommonMethods.lookFor(new int[ ] {indexBM,indexBM+9}, edges ) );
+		edges.remove( CommonMethods.lookFor(new int[ ] {indexBM+1,indexBM+10}, edges ) );
+	}
+	
+	public static void placeVW_DEBUGTOOL(int index){
+		int indexBM = CommonMethods.topLeftVertex(index);
+		vertical_tiles[index] = 1;
+		vertical_tiles_placed[index] = 1;
+		if(index+8<64){
+			vertical_tiles[index+8] = 1;
+		}
+		if(index-8>=0){
+			vertical_tiles[index-8] = 1;
+		}
+		horizontal_tiles[index] = 1;		
+		edges.remove( CommonMethods.lookFor(new int[ ] {indexBM,indexBM+1}, edges ) );
+		edges.remove( CommonMethods.lookFor(new int[ ] {indexBM+9,indexBM+10}, edges ) );
+		}
+	
 	static void logRecord(PrintWriter f,String currentPlayer) {
 		String verticeString = vertices.stream().map(Object::toString)
                 .collect(Collectors.joining(", "));
 		f.println(currentPlayer);
 		f.println(verticeString );
-		String edgeString = CommonMethods.convertToString(edges);
-		f.println(edgeString);
+		String horizontalTilesPlacedString = Arrays.toString(horizontal_tiles_placed);
+		String verticalTilesPlacedString = Arrays.toString(vertical_tiles_placed);
+
+		f.println("horizontal Tiles:");
+		f.println(horizontalTilesPlacedString);
+		f.println("vertical Tiles:");
+		f.println(verticalTilesPlacedString);
+
 		f.println(" ");
 	}
 	
 	public static void main(String[] args) throws IOException {
 		int AI_1_win_counts  = 0;
 		int AI_2_win_counts = 0;
+		int starting_player_wins = 0;
 		System.out.println("Iniciando");
 		for(int j=0; j<SIMS; j++) {
 			init();
 			boolean playing = true;
 			int turns = 0;
-			int starting_player_wins = 0;
-			PrintWriter f= new PrintWriter("record"+j+".txt");
-			if (ThreadLocalRandom.current().nextInt(0, 2) == 0 ) {
+
+			PrintWriter f= new PrintWriter("recordB"+j+".txt");
+			if (0==0||ThreadLocalRandom.current().nextInt(0, 2) == 0 ) {
 				
 				AI_1.colour = 'b';
 				AI_2.colour = 'w';
+				
+	//			placeHW_DEBUGTOOL(0);
+	//			placeHW_DEBUGTOOL(9);
+	//			placeHW_DEBUGTOOL(11);
+	//			placeHW_DEBUGTOOL(25);
+	//			placeHW_DEBUGTOOL(41);
+	//			placeHW_DEBUGTOOL(56);
+				
+	//			placeVW_DEBUGTOOL(8);
+	//			placeVW_DEBUGTOOL(20);
+	//			placeVW_DEBUGTOOL(32);
+	//			placeVW_DEBUGTOOL(42);
+	//			placeVW_DEBUGTOOL(51);
+	//			placeVW_DEBUGTOOL(57);
+
+	//			AI_1.walls = 4;
+	//			AI_2.walls =  4;
+				
+	//			vertices.set(4, 4);
+	//			vertices.set(76, 76);
+				
+	//			vertices.set(23, 'b');
+	//			vertices.set(67, 'w');
+
+				GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 
 				while(playing){
 					AI_1.main(args);
 					logRecord(f,"AI_1 plays:");
-					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns);
-					if(AI_1.AI_1_Wins() ) {
+					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+					if(AI_1.AI_1_Wins(vertices) ) {
 						playing= false;
 						AI_1_win_counts++;
 						starting_player_wins++;
@@ -85,9 +153,9 @@ public class QuoridorAIcompetition {
 					else if(playing) {
 						AI_2.main(args);
 						logRecord(f,"AI_2 plays:");
-						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_2","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns);
+						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_2","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 						turns++;
-						if(AI_2.AI_2_Wins() ) {
+						if(AI_2.AI_2_Wins(vertices) ) {
 							playing = false;
 							AI_2_win_counts++;
 						}
@@ -106,8 +174,8 @@ public class QuoridorAIcompetition {
 				while(playing){
 					AI_2.main(args);
 					logRecord(f,"AI_2 plays:");
-					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_2","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns);
-					if(AI_2.AI_2_Wins() ) {
+					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_2","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+					if(AI_2.AI_2_Wins(vertices) ) {
 						playing= false;
 						AI_2_win_counts++;
 						starting_player_wins++;
@@ -115,9 +183,9 @@ public class QuoridorAIcompetition {
 					else if(playing) {
 						AI_1.main(args);
 						logRecord(f,"AI_1 plays:");
-						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_1","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns);
+						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_1","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 						turns++;
-						if(AI_1.AI_1_Wins() ) {
+						if(AI_1.AI_1_Wins(vertices) ) {
 							playing = false;
 							AI_1_win_counts++;
 						}
@@ -130,6 +198,7 @@ public class QuoridorAIcompetition {
 		
 		System.out.println("AI_1 wins: "+AI_1_win_counts);
 		System.out.println("AI_2 wins: "+AI_2_win_counts);
+		System.out.println("The starting player wins "+starting_player_wins+" times.");
 		
 	}
 }

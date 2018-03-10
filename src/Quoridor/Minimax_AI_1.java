@@ -16,17 +16,17 @@ public class Minimax_AI_1 {
 	public static Move main(char player,ArrayList<Object> vertices,ArrayList<int[]> edges,int[] vertical_tiles,int[] horizontal_tiles,int depth,float alpha,float beta,int walls_ai_2,int walls_ai_1) {
 		char oppositePlayer = CommonMethods.findOppositePlayer(player);
 
-		if( AI_2.AI_2_Wins() ) {
+		if( AI_2.AI_2_Wins(vertices) ) {
 			Move x = new Move();
 			x.score = depth-100;
 			return x;
 		}
-		else if( AI_1.AI_1_Wins() ){
+		else if( AI_1.AI_1_Wins(vertices) ){
 			Move x = new Move();
 			x.score = 100-depth;
 			return x;
 		}
-		else if(depth==2){
+		else if(depth==3){
 			Move x = new Move();
 			float ev = evaluatingfunction(vertices,QuoridorAIcompetition.edges );
 			x.score = ev;
@@ -34,8 +34,8 @@ public class Minimax_AI_1 {
 		}
 		ArrayList<Move> avMoves = new ArrayList<Move>();
 		avMoves = CommonMethods.availableMoves(player,vertices,edges,walls_ai_2,walls_ai_1,vertical_tiles,horizontal_tiles);
-//		Move[] avMoves = availableMoves(player,vertices,edges,walls_ai_2,walls_ai_1,vertical_tiles,horizontal_tiles);
-		avMoves = CommonMethods.shuffle(avMoves);
+
+//		avMoves = CommonMethods.shuffle(avMoves);
 		Move bestMove = new Move();
 		if(player == AI_2.colour){
 			bestMove.score = 999f;

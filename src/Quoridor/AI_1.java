@@ -9,9 +9,9 @@ public class AI_1 {
 
 	static int walls = 10;
 	
-	static public boolean AI_1_Wins() {
+	static public boolean AI_1_Wins(ArrayList<Object> vertices) {
 		if(AI_1.colour=='b'){
-			int location = QuoridorAIcompetition.vertices.indexOf('b');
+			int location = vertices.indexOf('b');
 			int[] opposite = {0,1,2,3,4,5,6,7,8};
 			if( CommonMethods.contains(opposite,location) ){
 				return true;
@@ -19,7 +19,7 @@ public class AI_1 {
 			return false;
 		}
 		else if(AI_1.colour=='w'){
-			int location = QuoridorAIcompetition.vertices.indexOf('w');
+			int location = vertices.indexOf('w');
 			int[] opposite = {72,73,74,75,76,77,78,79,80};
 			if( CommonMethods.contains(opposite,location) ){
 				return true;
@@ -39,54 +39,33 @@ public class AI_1 {
 			walls --;
 			if( bestMove.kind.charAt(0) =='H'){
 				QuoridorAIcompetition.horizontal_tiles[bestMove.index] = 1;
+				QuoridorAIcompetition.horizontal_tiles_placed[bestMove.index] = 1;
 				
 				if(bestMove.index+1<64 && bestMove.index/8 == (bestMove.index+1)/8){
 					QuoridorAIcompetition.horizontal_tiles[bestMove.index+1] = 1;
 				}
-				
 				if(bestMove.index-1>=0 && Math.floor(bestMove.index/8) == Math.floor((bestMove.index-1)/8)){
 					QuoridorAIcompetition.horizontal_tiles[bestMove.index-1]=1;
 				}
-				
 				QuoridorAIcompetition.vertical_tiles[bestMove.index]=1;
-				
 				QuoridorAIcompetition.edges.remove( CommonMethods.lookFor(new int[ ] {indexBM,indexBM+9}, QuoridorAIcompetition.edges ) );
 				QuoridorAIcompetition.edges.remove( CommonMethods.lookFor(new int[ ] {indexBM+1,indexBM+10}, QuoridorAIcompetition.edges ) );
-				
-	//			QuoridorAIcompetition.edges.remove( new int[] {indexBM,indexBM+9} );
-	//			QuoridorAIcompetition.edges.remove( new int[] {indexBM+1,indexBM+10} );
 			}
 			else {
-				
-		//		disableVerticalWall(bestMove.index);
-				
 				QuoridorAIcompetition.vertical_tiles[bestMove.index] = 1;
-				
-				if(bestMove.index+8<64){
-					
+				QuoridorAIcompetition.vertical_tiles_placed[bestMove.index] = 1;
+				if(bestMove.index+8<64){	
 					QuoridorAIcompetition.vertical_tiles[bestMove.index+8] = 1;
-		//			disableVerticalWall(bestMove.index+8);
 				}
-				
 				if(bestMove.index-8>=0){
-					
 					QuoridorAIcompetition.vertical_tiles[bestMove.index-8] = 1;
-		//			disableVerticalWall(bestMove.index-8)
-				}
-				
+				}	
 				QuoridorAIcompetition.horizontal_tiles[bestMove.index] = 1;
-		//		disableHorizontalWall(bestMove.index);
-				
 				QuoridorAIcompetition.edges.remove( CommonMethods.lookFor(new int[ ] {indexBM,indexBM+1}, QuoridorAIcompetition.edges ) );
-				QuoridorAIcompetition.edges.remove( CommonMethods.lookFor(new int[ ] {indexBM+9,indexBM+10}, QuoridorAIcompetition.edges ) );
-				
-		//		aristas.splice(indexOf([indexBM,indexBM+1],edges), 1);
-		//		aristas.splice(indexOf([indexBM+9,indexBM+10],edges), 1);
+				QuoridorAIcompetition.edges.remove( CommonMethods.lookFor(new int[ ] {indexBM+9,indexBM+10}, QuoridorAIcompetition.edges ) );				
 			}
-			
 		}
 		else {
-			//
 			int start = QuoridorAIcompetition.vertices.indexOf(colour);
 			QuoridorAIcompetition.vertices.set(start, start);
 			QuoridorAIcompetition.vertices.set(bestMove.index,colour); 
