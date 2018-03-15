@@ -110,22 +110,6 @@ public class CommonMethods {
 				avMoves.add(move);
 			}
 		}
-		for(int i=0; i< horizontal_tiles.length;i++){
-			if(horizontal_tiles[i]==0  && numberwalls >0){
-				ArrayList<int[]> edgesCopy = new ArrayList<int[]>(edges);
-
-				int vertex_top_left = topLeftVertex(i);
-				edgesCopy.remove( CommonMethods.lookFor(new int[ ] {vertex_top_left,vertex_top_left+9}, edgesCopy) );
-				edgesCopy.remove( CommonMethods.lookFor(new int[ ] {vertex_top_left+1,vertex_top_left+10}, edgesCopy) );
-								
-				if(!invalidWall(vertices,edgesCopy) && !invalidWall(vertices,edgesCopy) ){
-					Move move = new Move();
-					move.kind="HW";
-					move.index= i;
-					avMoves.add(move);
-				}
-			}
-		}
 		for(int i=0; i< vertical_tiles.length;i++){
 			if(vertical_tiles[i]==0 && numberwalls>0){
 				ArrayList<int[]> edgesCopy = new ArrayList<int[]>(edges);
@@ -143,6 +127,24 @@ public class CommonMethods {
 				}
 			}
 		}
+
+		for(int i=0; i< horizontal_tiles.length;i++){
+			if(horizontal_tiles[i]==0  && numberwalls >0){
+				ArrayList<int[]> edgesCopy = new ArrayList<int[]>(edges);
+
+				int vertex_top_left = topLeftVertex(i);
+				edgesCopy.remove( CommonMethods.lookFor(new int[ ] {vertex_top_left,vertex_top_left+9}, edgesCopy) );
+				edgesCopy.remove( CommonMethods.lookFor(new int[ ] {vertex_top_left+1,vertex_top_left+10}, edgesCopy) );
+								
+				if(!invalidWall(vertices,edgesCopy) && !invalidWall(vertices,edgesCopy) ){
+					Move move = new Move();
+					move.kind="HW";
+					move.index= i;
+					avMoves.add(move);
+				}
+			}
+		}
+
 		return avMoves;
 	}
 	
@@ -286,7 +288,13 @@ public class CommonMethods {
 		}
 		return nonVisitedNeighbors;
 	}
-	
+
+
+	static public int movesToNextRow(char player, ArrayList<Object> vertices, ArrayList<int[]> edges){
+	int start = vertices.indexOf(player);
+	int currentRow = start/9;
+	return DijstrakNextRow(currentRow,player,vertices,edges);
+}
 	
 	static public int Dijstrak(char player, ArrayList<Object> vertices, ArrayList<int[]> edges){
 		ArrayList<Node> Nodes = new ArrayList<Node>();
@@ -328,6 +336,63 @@ public class CommonMethods {
 			//return Math.min(objective);
 		}
 		return -1000;
+	}
+
+	static public int DijstrakNextRow(int numberRow,char player,ArrayList<Object> vertices,ArrayList<int[]> edges){
+		ArrayList<Node> Nodes = new ArrayList<Node>();
+		int source = vertices.indexOf(player);
+		for (int i=0;i<81;i++){
+			Node node = new Node();
+			node.index = i;
+			if(i==source){
+				node.distance = 0;
+			}
+			else{
+				if( isAristaAvailable(node.index, source , edges) ){
+					node.distance = 1;
+				}
+				else{
+					node.distance=999;
+				}
+			}
+			Nodes.add(node);
+		}
+		ArrayList<Node> visited = new ArrayList<Node>();
+		visited.add(Nodes.get(source));
+		int[] nextRow = new int[9];
+		if(player== 'w'){
+			int count =0;
+			for(int x=9*(numberRow+1) ; x<=9*(numberRow+1)+8;x++ ){
+				if( x<81 ){
+					nextRow[count]=x;
+					count++;
+				}
+			}
+		}
+		else{
+			int count=0;
+			for(int x= 9*(numberRow-1 ); x< 9*numberRow;x++ ){
+				if(x>-1){
+					nextRow[count] = x;
+					count++;
+				}
+			}
+		}
+
+		while( visited.size() < vertices.size() && !reachedOppositeSide(player,visited) ){
+			Node currentNode = leastDistance(Nodes,visited);
+			visited.add(currentNode);
+			ArrayList<Node> nodesVisit = nonVisitedNeighbors(currentNode,visited,Nodes,edges);
+			for (int i=0;i<nodesVisit.size();i++ ){
+				nodesVisit.get(i).distance = Math.min(nodesVisit.get(i).distance, currentNode.distance + 1);
+						}
+		}
+		
+		Integer[] distance = new Integer[9];
+		for(int j=0; j<9;j++){
+			distance[j] = Nodes.get(nextRow[j]).distance;
+			}
+		return Collections.min(Arrays.asList(distance)); //  Math.min(...distanceAI);
 	}
 	
 }

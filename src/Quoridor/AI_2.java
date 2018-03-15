@@ -1,7 +1,7 @@
 package Quoridor;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AI_2 {
 	
@@ -29,10 +29,10 @@ public class AI_2 {
 	return true;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args,int turns) throws FileNotFoundException {
 		System.out.println("hola AI_2");
 		Move bestMove = new Move();
-		bestMove = Minimax_AI_2.main(AI_2.colour, QuoridorAIcompetition.vertices,QuoridorAIcompetition.edges,QuoridorAIcompetition.vertical_tiles,QuoridorAIcompetition.horizontal_tiles,0,-99999f, 99999f,AI_2.walls,AI_1.walls);
+		bestMove = Minimax_AI_2.main(turns,AI_2.colour, QuoridorAIcompetition.vertices,QuoridorAIcompetition.edges,QuoridorAIcompetition.vertical_tiles,QuoridorAIcompetition.horizontal_tiles,0,-99999f, 99999f,AI_2.walls,AI_1.walls);
 
 		if(bestMove.kind.charAt(0) !='P') {
 			int indexBM = CommonMethods.topLeftVertex(bestMove.index);

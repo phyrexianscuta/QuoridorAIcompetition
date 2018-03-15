@@ -1,7 +1,7 @@
 package Quoridor;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AI_1 {
 	
@@ -29,11 +29,12 @@ public class AI_1 {
 	return true;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args,int turns) throws FileNotFoundException  {
 		System.out.println("hola AI_1");
 		Move bestMove = new Move();
-		bestMove = Minimax_AI_1.main(AI_1.colour, QuoridorAIcompetition.vertices,QuoridorAIcompetition.edges,QuoridorAIcompetition.vertical_tiles,QuoridorAIcompetition.horizontal_tiles,0,-99999f, 99999f,AI_2.walls,AI_1.walls);
-
+//		PrintWriter g= new PrintWriter("Dijstrak_algorithm "+turns+".txt");
+		bestMove = Minimax_AI_1.main(turns,AI_1.colour, QuoridorAIcompetition.vertices,QuoridorAIcompetition.edges,QuoridorAIcompetition.vertical_tiles,QuoridorAIcompetition.horizontal_tiles,0,-99999f, 99999f,AI_2.walls,AI_1.walls);
+//		g.close();
 		if(bestMove.kind.charAt(0) !='P') {
 			int indexBM = CommonMethods.topLeftVertex(bestMove.index);
 			walls --;

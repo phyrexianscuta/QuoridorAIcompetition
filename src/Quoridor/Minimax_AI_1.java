@@ -1,5 +1,7 @@
 package Quoridor;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Minimax_AI_1 {
@@ -7,13 +9,25 @@ public class Minimax_AI_1 {
 	public static float evaluatingfunction(ArrayList<Object> vertices, ArrayList<int[]> edges ) {
 		int distAI_1 = CommonMethods.Dijstrak(AI_1.colour,vertices, edges);
 		int distAI_2 = CommonMethods.Dijstrak(AI_2.colour,vertices, edges);
+		
+//		if(turns==15555) {
+//			g.println("distAI_1 : "+ distAI_1);
+//			g.println("distAI_2 : "+ distAI_2);
+//			String verticeString = vertices.stream().map(Object::toString)
+//	                .collect(Collectors.joining(", "));
+//			g.println(verticeString);
+//			String edgesString = CommonMethods.convertToString(edges);
+//			g.println(edgesString);
+//			g.println("-------------");
+//		}
+		
 //		int movesToNextRowAI = movesToNextRow("O",vertices, edges);
 //		int movesToNextRowMe = movesToNextRow("M",vertices, edges);
 		return (float) distAI_2 - distAI_1; // + (movesToNextRowMe - movesToNextRowAI)/4;
 	
 	}
 	
-	public static Move main(char player,ArrayList<Object> vertices,ArrayList<int[]> edges,int[] vertical_tiles,int[] horizontal_tiles,int depth,float alpha,float beta,int walls_ai_2,int walls_ai_1) {
+	public static Move main(int turns, char player,ArrayList<Object> vertices,ArrayList<int[]> edges,int[] vertical_tiles,int[] horizontal_tiles,int depth,float alpha,float beta,int walls_ai_2,int walls_ai_1) throws FileNotFoundException  {
 		char oppositePlayer = CommonMethods.findOppositePlayer(player);
 
 		if( AI_2.AI_2_Wins(vertices) ) {
@@ -26,16 +40,15 @@ public class Minimax_AI_1 {
 			x.score = 100-depth;
 			return x;
 		}
-		else if(depth==3){
+		else if(depth==2){
 			Move x = new Move();
-			float ev = evaluatingfunction(vertices,QuoridorAIcompetition.edges );
+			float ev = evaluatingfunction(vertices, edges );
 			x.score = ev;
 			return x;
 		}
 		ArrayList<Move> avMoves = new ArrayList<Move>();
 		avMoves = CommonMethods.availableMoves(player,vertices,edges,walls_ai_2,walls_ai_1,vertical_tiles,horizontal_tiles);
-
-//		avMoves = CommonMethods.shuffle(avMoves);
+		avMoves = CommonMethods.shuffle(avMoves);
 		Move bestMove = new Move();
 		if(player == AI_2.colour){
 			bestMove.score = 999f;
@@ -87,17 +100,11 @@ public class Minimax_AI_1 {
 					}
 					horizontal_tiles_copy[move.index] = 1;
 					int vertex_top_left = CommonMethods.topLeftVertex(move.index);
-					if( CommonMethods.lookFor(new int[] {vertex_top_left,vertex_top_left+1}, edgesCopy) <0) {
-						System.out.println("error minimax ai_1");
-					}
-					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left,vertex_top_left+1}, edgesCopy) );
-					if( CommonMethods.lookFor(new int[] {vertex_top_left+9,vertex_top_left+10}, edgesCopy) <0 ) {
-						System.out.println("error minimax ai_1");
-					}
-					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left+9,vertex_top_left+10}, edgesCopy) );
 
+					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left,vertex_top_left+1}, edgesCopy) );
+					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left+9,vertex_top_left+10}, edgesCopy) );
 				}
-				Move result=Minimax_AI_1.main(oppositePlayer,verticesCopy,edgesCopy,vertical_tiles_copy,horizontal_tiles_copy,depth+1,alpha,beta,walls_ai_2_copy,walls_ai_1_copy);
+				Move result=Minimax_AI_1.main(turns,oppositePlayer,verticesCopy,edgesCopy,vertical_tiles_copy,horizontal_tiles_copy,depth+1,alpha,beta,walls_ai_2_copy,walls_ai_1_copy);
 				move.score = result.score;
 				if(move.score < bestMove.score){
 					bestMove.index = move.index;
@@ -112,6 +119,11 @@ public class Minimax_AI_1 {
 			return bestMove;
 		}
 		else if(player==AI_1.colour){
+	//		PrintWriter ff = null;
+	//		if(depth==0) {
+	//			int tuto = turns +1;
+	//		ff= new PrintWriter("Scores "+tuto+" AI_1.txt");
+	//		}
 			bestMove.score =-999f;
 			for(int l=0;l< avMoves.size();l++){
 				Move move= new Move();
@@ -163,8 +175,11 @@ public class Minimax_AI_1 {
 					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left,vertex_top_left+1}, edgesCopy) );
 					edgesCopy.remove( CommonMethods.lookFor(new int[] {vertex_top_left+9,vertex_top_left+10}, edgesCopy) );
 				}
-				Move result= Minimax_AI_1.main(oppositePlayer,verticesCopy,edgesCopy,vertical_tiles_copy,horizontal_tiles_copy,depth+1,alpha,beta,walls_ai_2_copy,walls_ai_1_copy);
+				Move result= Minimax_AI_1.main(turns,oppositePlayer,verticesCopy,edgesCopy,vertical_tiles_copy,horizontal_tiles_copy,depth+1,alpha,beta,walls_ai_2_copy,walls_ai_1_copy);
 				move.score = result.score;
+	//			if(depth==0 ) {
+	//				ff.println(move.kind+", "+move.index+", "+"score:"+move.score);
+	//			}
 				if(move.score > bestMove.score){
 					bestMove.index = move.index;
 					bestMove.score = move.score;
@@ -172,9 +187,18 @@ public class Minimax_AI_1 {
 				}
 				alpha = Math.max(alpha,bestMove.score);
 				if(beta <= alpha){
+	//				if(depth==0) {
+	//					ff.println("break");						
+	//				}
 					break;
 				}
 			}
+	//		if(depth==0) {
+	//			ff.println("best Move:"+bestMove.kind+", "+bestMove.index+", "+"score:"+bestMove.score);
+	//		}
+	//		if(depth==0) {
+	//			ff.close();				
+	//		}
 			return bestMove;
 		}
 		Move movem = new Move();
