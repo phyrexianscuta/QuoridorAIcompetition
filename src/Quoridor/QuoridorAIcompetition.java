@@ -18,7 +18,7 @@ public class QuoridorAIcompetition {
 	static int[] horizontal_tiles_placed = new int[64];
 	static int[] vertical_tiles_placed = new  int[64];
 	
-	static int SIMS = 1;
+	static int SIMS = 20;
 	
 	static void setVertices() {
 		vertices.clear();
@@ -48,6 +48,8 @@ public class QuoridorAIcompetition {
 		QuoridorAIcompetition.setEdges();
 		Arrays.fill(horizontal_tiles, 0);
 		Arrays.fill(vertical_tiles, 0);
+		Arrays.fill(horizontal_tiles_placed, 0);
+		Arrays.fill(vertical_tiles_placed, 0);
 		AI_1.walls = 10;
 		AI_2.walls = 10;
 	}
@@ -110,55 +112,60 @@ public class QuoridorAIcompetition {
 			boolean playing = true;
 			int turns = 0;
 
-			PrintWriter f= new PrintWriter("recordB"+j+".txt");
-			if (0==0||ThreadLocalRandom.current().nextInt(0, 2) == 0 ) {
+			PrintWriter f= new PrintWriter("log "+j+".txt");
+			if (ThreadLocalRandom.current().nextInt(0, 2) == 0 ) {
 				
 				AI_1.colour = 'b';
 				AI_2.colour = 'w';
 				
-	//			placeHW_DEBUGTOOL(0);
-	//			placeHW_DEBUGTOOL(9);
-	//			placeHW_DEBUGTOOL(11);
-	//			placeHW_DEBUGTOOL(25);
+	//			placeHW_DEBUGTOOL(1);
+	//			placeHW_DEBUGTOOL(3);
+	//			placeHW_DEBUGTOOL(5);
+	//			placeHW_DEBUGTOOL(7);
 	//			placeHW_DEBUGTOOL(41);
-	//			placeHW_DEBUGTOOL(56);
+	//			placeHW_DEBUGTOOL(43);
+	//			placeHW_DEBUGTOOL(45);
+	//			placeHW_DEBUGTOOL(47);
 				
-	//			placeVW_DEBUGTOOL(8);
-	//			placeVW_DEBUGTOOL(20);
+	//			placeVW_DEBUGTOOL(0);
+	//			placeVW_DEBUGTOOL(18);
 	//			placeVW_DEBUGTOOL(32);
-	//			placeVW_DEBUGTOOL(42);
+	//			placeVW_DEBUGTOOL(48);
 	//			placeVW_DEBUGTOOL(51);
 	//			placeVW_DEBUGTOOL(57);
 
-	//			AI_1.walls = 4;
-	//			AI_2.walls =  4;
+	//			AI_1.walls = 5;
+	//			AI_2.walls = 4;
 				
-	//			vertices.set(4, 4);
-	//			vertices.set(76, 76);
+	//			vertices.set(4,4);
+	//			vertices.set(76,76);
 				
-	//			vertices.set(23, 'b');
-	//			vertices.set(67, 'w');
+	//			vertices.set(29, 'w');
+	//			vertices.set(30, 'b');
 
-				GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+				GraphPosition.main(vertices, edges,"000Inicial","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 
 				while(playing){
-					AI_1.main(args);
+					AI_1.main(args,turns);
+					int tuto = turns +1;
+					f.println("Turno: "+tuto);
 					logRecord(f,"AI_1 plays:");
-					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_1","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 					if(AI_1.AI_1_Wins(vertices) ) {
 						playing= false;
 						AI_1_win_counts++;
 						starting_player_wins++;
 					}
 					else if(playing) {
-						AI_2.main(args);
+						AI_2.main(args,turns);
 						logRecord(f,"AI_2 plays:");
-						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_2","DirectoryB"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_2","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 						turns++;
 						if(AI_2.AI_2_Wins(vertices) ) {
 							playing = false;
 							AI_2_win_counts++;
 						}
+						f.println("--------------");
 					}
 					
 					System.out.println(turns);
@@ -171,19 +178,21 @@ public class QuoridorAIcompetition {
 				AI_1.colour = 'w';
 				AI_2.colour = 'b';
 				
+				GraphPosition.main(vertices, edges,"000Inicial","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+				
 				while(playing){
-					AI_2.main(args);
+					AI_2.main(args,turns);
 					logRecord(f,"AI_2 plays:");
-					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_2","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+					GraphPosition.main(vertices, edges,"position"+turns+"_a_ai_2","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 					if(AI_2.AI_2_Wins(vertices) ) {
 						playing= false;
 						AI_2_win_counts++;
 						starting_player_wins++;
 					}
 					else if(playing) {
-						AI_1.main(args);
+						AI_1.main(args,turns);
 						logRecord(f,"AI_1 plays:");
-						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_1","Directory"+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
+						GraphPosition.main(vertices, edges,"position"+turns+"_b_ai_1","Directory "+j, AI_1.colour, AI_2.colour, AI_1.walls, AI_2.walls,turns,horizontal_tiles_placed,vertical_tiles_placed);
 						turns++;
 						if(AI_1.AI_1_Wins(vertices) ) {
 							playing = false;
